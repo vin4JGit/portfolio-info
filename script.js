@@ -83,26 +83,36 @@ document.addEventListener('DOMContentLoaded', () => {
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            // Simulating form submission
             const submitBtn = contactForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerText;
 
             submitBtn.innerText = 'Sending...';
             submitBtn.disabled = true;
 
-            setTimeout(() => {
-                // Mock success
-                formStatus.innerHTML = '<span style="color: green;"><i class="fas fa-check"></i> Message sent successfully! I will get back to you soon.</span>';
-                contactForm.reset();
+            const formData = new FormData(contactForm);
 
-                submitBtn.innerText = originalText;
-                submitBtn.disabled = false;
+            fetch("https://formsubmit.co/ajax/vink4etrans@gmail.com", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    formStatus.innerHTML = '<span style="color: green;"><i class="fas fa-check"></i> Message sent successfully! I will get back to you soon.</span>';
+                    contactForm.reset();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    formStatus.innerHTML = '<span style="color: red;"><i class="fas fa-exclamation-circle"></i> Something went wrong. Please try again.</span>';
+                })
+                .finally(() => {
+                    submitBtn.innerText = originalText;
+                    submitBtn.disabled = false;
 
-                // Clear success message after 5 seconds
-                setTimeout(() => {
-                    formStatus.innerHTML = '';
-                }, 5000);
-            }, 1000); // 1 second simulated delay
+                    // Clear status message after 5 seconds
+                    setTimeout(() => {
+                        formStatus.innerHTML = '';
+                    }, 5000);
+                });
         });
     }
 });
